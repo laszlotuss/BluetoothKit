@@ -103,7 +103,12 @@ public class BKPeripheral: BKPeer, BKCBPeripheralManagerDelegate, BKAvailability
         do {
             try stateMachine.handleEvent(event: .start)
             _configuration = configuration
+#if os(watchOS)
+            peripheralManager = CBPeripheralManager()
+            peripheralManager.delegate = peripheralManagerDelegateProxy
+#else
             peripheralManager = CBPeripheralManager(delegate: peripheralManagerDelegateProxy, queue: nil, options: nil)
+#endif
         } catch let error {
             throw BKError.internalError(underlyingError: error)
         }
@@ -151,12 +156,14 @@ public class BKPeripheral: BKPeer, BKCBPeripheralManagerDelegate, BKAvailability
             availabilityObserver.availabilityObserver?.availabilityObserver(self, availabilityDidChange: .available)
         }
         if !peripheralManager.isAdvertising {
+#if !os(watchOS)
             dataService = CBMutableService(type: _configuration.dataServiceUUID, primary: true)
             let properties: CBCharacteristicProperties = [ .read, .notify, .writeWithoutResponse, .write ]
             let permissions: CBAttributePermissions = [ .readable, .writeable ]
             characteristicData = CBMutableCharacteristic(type: _configuration.dataServiceCharacteristicUUID, properties: properties, value: nil, permissions: permissions)
             dataService.characteristics = [ characteristicData ]
             peripheralManager.add(dataService)
+#endif
         }
     }
 
