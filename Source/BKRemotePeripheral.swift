@@ -43,13 +43,15 @@ public protocol BKRemotePeripheralDelegate: AnyObject {
      */
     func remotePeripheralIsReady(_ remotePeripheral: BKRemotePeripheral)
 
+    
+    func peripheral(_ peripheral: BKRemotePeripheral, didModifyServices invalidatedServices: [CBService])
 }
 
 /**
     Class to represent a remote peripheral that can be connected to by BKCentral objects.
 */
 public class BKRemotePeripheral: BKRemotePeer, BKCBPeripheralDelegate {
-
+    
     // MARK: Enums
 
     /**
@@ -150,6 +152,10 @@ public class BKRemotePeripheral: BKRemotePeer, BKCBPeripheralDelegate {
 
     internal func peripheralDidUpdateName(_ peripheral: CBPeripheral) {
         peripheralDelegate?.remotePeripheral(self, didUpdateName: name!)
+    }
+    
+    internal func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        peripheralDelegate?.peripheral(self, didModifyServices: invalidatedServices)
     }
 
     internal func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {

@@ -28,6 +28,7 @@ import CoreBluetooth
 internal protocol BKCBPeripheralDelegate: AnyObject {
     func peripheralDidUpdateName(_ peripheral: CBPeripheral)
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?)
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService])
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?)
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?)
 }
@@ -49,6 +50,10 @@ internal class BKCBPeripheralDelegateProxy: NSObject, CBPeripheralDelegate {
     internal func peripheralDidUpdateName(_ peripheral: CBPeripheral) {
         // print("peripheralDidUpdateName: \(peripheral)")
         delegate?.peripheralDidUpdateName(peripheral)
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        delegate?.peripheral(peripheral, didModifyServices: invalidatedServices)
     }
 
     internal func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
